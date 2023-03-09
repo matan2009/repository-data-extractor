@@ -32,7 +32,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     token = args.token
     repo_name = args.repo_name
-    base_api_endpoint = f'https://api.github.com/repos/{repo_name}'
+    base_api_endpoint = f'https://api.github.com/repos/{repo_name}' #todo: move to configurations
     headers = {'Authorization': f'token {token}'}
     logger = create_logger()
     repository_extractor_helper = RepositoryExtractorHelper(logger, base_api_endpoint, headers)
