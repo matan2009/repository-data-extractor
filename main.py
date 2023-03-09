@@ -9,6 +9,20 @@ def main():
     print(latest_releases)
     num_of_forks = repository_extractor_helper.get_number_of_repo_forks()
     print(num_of_forks)
+    num_of_stars = repository_extractor_helper.get_number_of_repo_stars()
+    print(num_of_stars)
+    contributors = repository_extractor_helper.get_repo_contributors()
+    num_of_contributors = len(contributors)
+    print(num_of_contributors)
+    pull_requests = repository_extractor_helper.get_repo_pull_requests()
+    num_of_pull_requests = len(pull_requests)
+    print(num_of_pull_requests)
+    num_of_commits = repository_extractor_helper.get_number_of_repo_commits()
+    print(num_of_commits)
+    contributors_per_amount_of_commits = repository_extractor_helper.get_contributors_per_amount_of_commits(contributors)
+    print(contributors_per_amount_of_commits)
+    contributors_per_amount_of_pull_requests = repository_extractor_helper.get_contributors_per_amount_of_pull_requests(pull_requests)
+    print(contributors_per_amount_of_pull_requests)
 
 
 if __name__ == '__main__':
