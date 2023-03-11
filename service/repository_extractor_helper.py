@@ -21,7 +21,8 @@ class RepositoryExtractorHelper:
         self.headers = headers
         config = get_configurations()
         helper_config = config["repository_extractor_helper"]
-        self.configurations = RepositoryExtractorHelperConfigurations(helper_config["max_retries"], helper_config["sleep_time"])
+        self.configurations = RepositoryExtractorHelperConfigurations(helper_config["max_retries"],
+                                                                      helper_config["sleep_time_between_retries"])
 
     def get_repo_latest_releases(self) -> list or None:
         latest_releases_names = []
@@ -32,19 +33,19 @@ class RepositoryExtractorHelper:
             try:
                 response = requests.get(api_endpoint, headers=self.headers)
                 if response.status_code != HTTPStatus.OK:
-                    raise requests.exceptions.HTTPError(response.status_code)
+                    raise requests.exceptions.HTTPError(f"the received status code is {response.status_code} from {self.base_api_endpoint}")
                 latest_releases = json.loads(response.content)[:3]
                 for release in latest_releases:
                     latest_releases_names.append(release["name"])
                 return latest_releases_names
 
             except requests.exceptions.HTTPError as ex:
-                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}, the api endpoint is {api_endpoint}"
+                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}"
                 self.logger.warning("an http error occurred during the api request", extra={"extra": extra_msg})
                 status_code = ex.args[0]
                 if status_code >= 500:
                     retry_number += 1
-                    time.sleep(self.configurations.sleep_time)
+                    time.sleep(self.configurations.sleep_time_between_retries)
                 else:
                     break
 
@@ -63,16 +64,16 @@ class RepositoryExtractorHelper:
             try:
                 response = requests.get(self.base_api_endpoint, headers=self.headers)
                 if response.status_code != HTTPStatus.OK:
-                    raise requests.exceptions.HTTPError(response.status_code)
+                    raise requests.exceptions.HTTPError(f"the received status code is {response.status_code} from {self.base_api_endpoint}")
                 return response.json()['forks_count']
 
             except requests.exceptions.HTTPError as ex:
-                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}, the api endpoint is {api_endpoint}"
+                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}"
                 self.logger.warning("an http error occurred during the api request", extra={"extra": extra_msg})
                 status_code = ex.args[0]
                 if status_code >= 500:
                     retry_number += 1
-                    time.sleep(self.configurations.sleep_time)
+                    time.sleep(self.configurations.sleep_time_between_retries)
                 else:
                     break
 
@@ -91,16 +92,16 @@ class RepositoryExtractorHelper:
             try:
                 response = requests.get(self.base_api_endpoint, headers=self.headers)
                 if response.status_code != HTTPStatus.OK:
-                    raise requests.exceptions.HTTPError(response.status_code)
+                    raise requests.exceptions.HTTPError(f"the received status code is {response.status_code} from {self.base_api_endpoint}")
                 return response.json()['stargazers_count']
 
             except requests.exceptions.HTTPError as ex:
-                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}, the api endpoint is {self.base_api_endpoint}"
+                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}"
                 self.logger.warning("an http error occurred during the api request", extra={"extra": extra_msg})
                 status_code = ex.args[0]
                 if status_code >= 500:
                     retry_number += 1
-                    time.sleep(self.configurations.sleep_time)
+                    time.sleep(self.configurations.sleep_time_between_retries)
                 else:
                     break
 
@@ -126,7 +127,7 @@ class RepositoryExtractorHelper:
             try:
                 response = requests.get(api_endpoint, headers=self.headers)
                 if response.status_code != HTTPStatus.OK:
-                    raise requests.exceptions.HTTPError(response.status_code)
+                    raise requests.exceptions.HTTPError(f"the received status code is {response.status_code} from {api_endpoint}")
                 contributors_bulk = response.json()
                 contributors.extend(contributors_bulk)
                 if len(contributors_bulk) == max_bulk_size:
@@ -136,12 +137,12 @@ class RepositoryExtractorHelper:
                     return contributors
 
             except requests.exceptions.HTTPError as ex:
-                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}, the api endpoint is {api_endpoint}"
+                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}"
                 self.logger.warning("an http error occurred during the api request", extra={"extra": extra_msg})
                 status_code = ex.args[0]
                 if status_code >= 500:
                     retry_number += 1
-                    time.sleep(self.configurations.sleep_time)
+                    time.sleep(self.configurations.sleep_time_between_retries)
                 else:
                     break
 
@@ -167,7 +168,7 @@ class RepositoryExtractorHelper:
             try:
                 response = requests.get(api_endpoint, headers=self.headers)
                 if not response.status_code == 200:
-                    raise requests.exceptions.HTTPError(f"the received status code is {response.status_code} from {self.base_api_endpoint}")
+                    raise requests.exceptions.HTTPError(f"the received status code is {response.status_code} from {api_endpoint}")
                 pulls_requests_bulk = response.json()
                 pulls_requests.extend(pulls_requests_bulk)
                 if len(pulls_requests_bulk) == max_bulk_size:
@@ -177,12 +178,12 @@ class RepositoryExtractorHelper:
                     return pulls_requests
 
             except requests.exceptions.HTTPError as ex:
-                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}, the api endpoint is {api_endpoint}"
+                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}"
                 self.logger.warning("an http error occurred during the api request", extra={"extra": extra_msg})
                 status_code = ex.args[0]
                 if status_code >= 500:
                     retry_number += 1
-                    time.sleep(self.configurations.sleep_time)
+                    time.sleep(self.configurations.sleep_time_between_retries)
                 else:
                     break
 
@@ -208,7 +209,7 @@ class RepositoryExtractorHelper:
             try:
                 response = requests.get(api_endpoint, headers=self.headers)
                 if not response.status_code == 200:
-                    raise requests.exceptions.HTTPError(f"the received status code is {response.status_code} from {self.base_api_endpoint}")
+                    raise requests.exceptions.HTTPError(f"the received status code is {response.status_code} from {api_endpoint}")
                 commits_bulk = response.json()
                 commits.extend(commits_bulk)
                 if len(commits_bulk) == max_bulk_size:
@@ -218,12 +219,12 @@ class RepositoryExtractorHelper:
                     return len(commits)
 
             except requests.exceptions.HTTPError as ex:
-                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}, the api endpoint is {api_endpoint}"
+                extra_msg = f"exception is {str(ex)}, exception_type is {type(ex).__name__}"
                 self.logger.warning("an http error occurred during the api request", extra={"extra": extra_msg})
                 status_code = ex.args[0]
                 if status_code >= 500:
                     retry_number += 1
-                    time.sleep(self.configurations.sleep_time)
+                    time.sleep(self.configurations.sleep_time_between_retries)
                 else:
                     break
 

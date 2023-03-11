@@ -2,6 +2,6 @@
   "repository_extractor_helper":
   {
     "max_retries": 3,
-    "sleep_time": 5
+    "sleep_time_between_retries": 5
   }
 }
