@@ -56,15 +56,10 @@ class TestCyberScansHelper(TestCase):
         res = self.helper.get_number_of_repo_forks()
         self.assertIsNone(res)
 
-    # @mock.patch('requests.get')
-    # def test_get_number_of_repo_forks_success_after_retry(self, mock_get):
-    #     mock_get.side_effect = [mock.Mock(status_code=500, content=b''), mock.Mock(status_code=200,
-    #                                                                                content=b'[{"name": "1.1.1"}, '
-    #                                                                                        b'{"name": "2.2.2"}, '
-    #                                                                                        b'{"name": "3.3.3"}]')]
-    #     res = self.helper.get_repo_latest_releases()
-    #     self.assertEqual(type(res), list)
-    #     self.assertEqual(len(res), 3)
-    #     self.assertEqual(res[0], "1.1.1")
-    #     self.assertEqual(res[1], "2.2.2")
-    #     self.assertEqual(res[2], "3.3.3")
+    @mock.patch('requests.get')
+    def test_get_repo_contributors_success(self, mock_get):
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = [{"login": "name", "node_id": "id", "url": "url"}]
+        res = self.helper.get_repo_contributors()
+        self.assertEqual(type(res), list)
+        self.assertEqual(res, [{"login": "name", "node_id": "id", "url": "url"}])
